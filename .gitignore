@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Dados sensíveis gerados em runtime
+data/keys/
+data/messages/
+data/test_files/
+
+# Relatório final compilado
+*.pdf
