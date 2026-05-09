@@ -139,7 +139,7 @@ Critério de aceitação:
 - O utilizador recebe aviso antes de substituir chaves.
 
 ==================================================
-K8 — Implementar hashing BLAKE2b
+K8 — Implementar hashing BLAKE2b                    ✅ Feito
 ==================================================
 
 Objetivo:
@@ -148,14 +148,14 @@ Garantir integridade da mensagem.
 O que fazer:
 - Criar:
   hash_message()
-- Usar SBLAKE2b
-- Gerar hash da mensagem e metadados.
+- Usar BLAKE2b
+- Gerar hash da mensagem
 
 Critério de aceitação:
 - Alterar um caractere altera completamente o hash.
 
 ==================================================
-K9 — Implementar assinatura digital RSA-PSS
+K9 — Implementar assinatura digital Ed25519
 ==================================================
 
 Objetivo:

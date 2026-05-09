@@ -19,8 +19,6 @@ USER_CARLA = "carla"
 USER_RUI = "rui"
 
 # Parâmetros criptográficos
-RSA_KEY_SIZE = 2048
-AES_KEY_SIZE = 32  # 32 bytes = AES-256 Extensões dos ficheiros PRIVATE_KEY_FILE = "private_key.pem" PUBLIC_KEY_FILE = "public_key.pem" MESSAGE_EXTENSION = ".msg"
 ENCRYPTED_EXTENSION = ".enc"
 SIGNATURE_EXTENSION = ".sig"
 
