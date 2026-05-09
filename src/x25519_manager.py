@@ -21,4 +21,5 @@ def derive_chacha20_key(shared_secret: bytes, salt: bytes | None = None) -> byte
     """
     Deriva uma chave simétrica de 32 bytes para ChaCha20-Poly1305.
     """
+    v
     return HKDF(algorithm=hashes.SHA256(),length=32,salt=salt,info=b"securemessenger-chacha20-key",).derive(shared_secret)

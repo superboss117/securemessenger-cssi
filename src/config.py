@@ -1,37 +1,86 @@
-# src/config.py
-
 from pathlib import Path
 
-# Diretório base do projeto
+
+# =========================================
+# CAMINHOS DO SISTEMA
+# =========================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Diretórios principais
 DATA_DIR = BASE_DIR / "data"
+
 KEYS_DIR = DATA_DIR / "keys"
+
 MESSAGES_DIR = DATA_DIR / "messages"
 
-# Diretórios de mensagens
-INBOX_DIR = MESSAGES_DIR / "inbox"
-OUTBOX_DIR = MESSAGES_DIR / "outbox"
 
-# Utilizadores de teste
-USER_CARLA = "carla"
-USER_RUI = "rui"
+# =========================================
+# USERS DO SISTEMA
+# =========================================
 
-# Parâmetros criptográficos
-ENCRYPTED_EXTENSION = ".enc"
-SIGNATURE_EXTENSION = ".sig"
+DRA_CARLA = "carla"
+
+ENF_RUI = "rui"
 
 
-def create_required_directories():
-    """
-    Cria as pastas necessárias caso ainda não existam.
-    """
-    DATA_DIR.mkdir(exist_ok=True)
-    KEYS_DIR.mkdir(exist_ok=True)
-    MESSAGES_DIR.mkdir(exist_ok=True)
-    INBOX_DIR.mkdir(exist_ok=True)
-    OUTBOX_DIR.mkdir(exist_ok=True)
+# =========================================
+# CONFIGURAÇÃO CRIPTOGRÁFICA
+# =========================================
 
-    (KEYS_DIR / USER_CARLA).mkdir(exist_ok=True)
-    (KEYS_DIR / USER_RUI).mkdir(exist_ok=True)
+ALGORITMO_HASH = "BLAKE2b"
+
+ALGORITMO_ASSINATURA = "Ed25519"
+
+ALGORITMO_TROCA_CHAVES = "X25519"
+
+ALGORITMO_KDF = "HKDF-SHA256"
+
+ALGORITMO_CIFRA = "ChaCha20-Poly1305"
+
+
+# =========================================
+# PARÂMETROS CRIPTOGRÁFICOS
+# =========================================
+
+TAMANHO_CHAVE_CHACHA20 = 32
+
+TAMANHO_NONCE_CHACHA20 = 12
+
+TAMANHO_DERIVACAO_HKDF = 32
+
+INFO_HKDF = b"securemessenger-hospital"
+
+SALT_HKDF = None
+
+
+# =========================================
+# TIPOS DE MENSAGEM
+# =========================================
+
+TIPOS_MENSAGEM = {
+    "1": "transferencia_doente",
+    "2": "alteracao_medicacao",
+    "3": "resultado_urgente",
+}
+
+
+# =========================================
+# DEFINIÇÕES DE SEGURANÇA
+# =========================================
+
+PERMITIR_REMETENTES_DESCONHECIDOS = False
+
+VALIDAR_ASSINATURAS = True
+
+VALIDAR_HASHES = True
+
+REJEITAR_MENSAGENS_INVALIDAS = True
+
+
+# =========================================
+# DEFINIÇÕES GERAIS DO SISTEMA
+# =========================================
+
+NOME_SISTEMA = "Sistema Seguro de Mensagens Hospitalares"
+
+VERSAO_SISTEMA = "1.0"
