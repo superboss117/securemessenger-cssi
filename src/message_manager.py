@@ -9,6 +9,14 @@ from config import (
     ALGORITMO_CIFRAGEM,
     ALGORITMO_ASSINATURA_DIGITAL,
     ALGORITMO_HASH,
+    CAMPO_REMETENTE,
+    CAMPO_DESTINATARIO,
+    CAMPO_TIMESTAMP,
+    CAMPO_ALGORITMOS,
+    CAMPO_NONCE,
+    CAMPO_CIPHERTEXT,
+    CAMPO_ASSINATURA,
+    CAMPO_HASH,
 )
 
 
@@ -25,20 +33,20 @@ def criar_json_mensagem(
     hash_value: str | None = None,
 ) -> dict:
     return {
-        "sender": sender,
-        "receiver": receiver,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "algorithm": {
+        CAMPO_REMETENTE: sender,
+        CAMPO_DESTINATARIO: receiver,
+        CAMPO_TIMESTAMP: datetime.now(timezone.utc).isoformat(),
+        CAMPO_ALGORITMOS: {
             "key_exchange": ALGORITMO_TROCA_DE_CHAVES,
             "kdf": ALGORITMO_DERIVACAO_DE_CHAVES,
             "cipher": ALGORITMO_CIFRAGEM,
             "signature": ALGORITMO_ASSINATURA_DIGITAL,
             "hash": ALGORITMO_HASH,
         },
-        "nonce": nonce.hex(),
-        "ciphertext": ciphertext.hex(),
-        "signature": signature.hex() if signature else None,
-        "hash": hash_value,
+        CAMPO_NONCE: nonce.hex(),
+        CAMPO_CIPHERTEXT: ciphertext.hex(),
+        CAMPO_ASSINATURA: signature.hex() if signature else None,
+        CAMPO_HASH: hash_value,
     }
 
 

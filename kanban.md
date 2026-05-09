@@ -16,8 +16,6 @@ O que fazer:
   - data/
   - data/keys/
   - data/messages/
-  - data/messages/inbox/
-  - data/messages/outbox/
   - relatorio/
 - Criar os ficheiros:
   - README.md
@@ -91,14 +89,13 @@ Critério de aceitação:
 - Apagar data/ e correr o programa recria tudo automaticamente.
 
 ==================================================
-K5 — Implementar geração de chaves RSA              ✅ Feito
+K5 — Implementar geração de chaves          ✅ Feito
 ==================================================
 
 Objetivo:
 Gerar pares de chaves para Carla e Rui.
 
 O que fazer:
-- Criar função generate_rsa_keypair()
 - Gerar:
   - private_key.pem
   - public_key.pem
@@ -119,7 +116,7 @@ O que fazer:
   load_private_key()
   load_public_key()
 - Ler ficheiros PEM.
-- Retornar objetos de chave RSA.
+- Retornar objetos de chave.
 
 Critério de aceitação:
 - As chaves carregam sem erro.
@@ -155,7 +152,7 @@ Critério de aceitação:
 - Alterar um caractere altera completamente o hash.
 
 ==================================================
-K9 — Implementar assinatura digital Ed25519
+K9 — Implementar assinatura digital Ed25519          ✅ Feito
 ==================================================
 
 Objetivo:
@@ -171,9 +168,8 @@ O que fazer:
 Critério de aceitação:
 - Mensagem legítima passa verificação.
 - Mensagem adulterada falha.
-
 ==================================================
-K10 — Implementar cifra AES-GCM
+K10 — Implementar cifra ChaCha20Poly1305            ✅ Feito
 ==================================================
 
 Objetivo:
@@ -183,30 +179,35 @@ O que fazer:
 - Criar:
   encrypt_message()
   decrypt_message()
-- Gerar chave AES aleatória.
 - Gerar nonce aleatório.
-- Usar AES-GCM.
+- Usar ChaCha20Poly1305.
 
 Critério de aceitação:
-- Só quem possui a chave AES consegue decifrar.
+- Só quem possui a chave ChaCha20Poly1305 consegue decifrar.
 - Alterações no ciphertext são detetadas.
 
 ==================================================
-K11 — Implementar RSA-OAEP para chave AES
+K10 — Implementar cifra ChaCha20Poly1305            ✅ Feito
 ==================================================
 
 Objetivo:
-Transportar a chave AES de forma segura.
+Garantir confidencialidade da mensagem.
 
 O que fazer:
-- Cifrar chave AES com chave pública do Rui.
-- Decifrar com chave privada do Rui.
+- Criar:
+  encrypt_message()
+  decrypt_message()
+- Gerar nonce aleatório.
+- Usar ChaCha20Poly1305.
 
 Critério de aceitação:
-- Apenas o Rui consegue recuperar a chave AES.
+- Só quem possui a chave ChaCha20Poly1305 consegue decifrar.
+- Alterações no ciphertext são detetadas.
+
+
 
 ==================================================
-K12 — Definir formato JSON da mensagem segura
+K12 — Definir formato JSON da mensagem segura       
 ==================================================
 
 Objetivo:
@@ -226,7 +227,7 @@ Critério de aceitação:
 - O JSON é legível e contém todos os dados necessários.
 
 ==================================================
-K13 — Implementar envio de mensagem segura
+K13 — Implementar envio de mensagem segura          ✅ Feito
 ==================================================
 
 Objetivo:
@@ -237,14 +238,13 @@ O que fazer:
 - Calcular hash.
 - Assinar.
 - Cifrar conteúdo.
-- Cifrar chave AES.
-- Guardar JSON em outbox.
+- Guardar JSON em pasta partilhada.
 
 Critério de aceitação:
 - O ficheiro seguro aparece na pasta.
 
 ==================================================
-K14 — Implementar receção de mensagem
+K14 — Implementar receção de mensagem                ✅ Feito 
 ==================================================
 
 Objetivo:
@@ -252,7 +252,6 @@ Permitir ao Rui receber mensagens.
 
 O que fazer:
 - Ler JSON.
-- Recuperar chave AES.
 - Decifrar conteúdo.
 - Recalcular hash.
 - Verificar assinatura.
@@ -260,22 +259,10 @@ O que fazer:
 Critério de aceitação:
 - O Rui consegue ler mensagem válida.
 
-==================================================
-K15 — Guardar mensagens recebidas
-==================================================
 
-Objetivo:
-Arquivar mensagens válidas.
-
-O que fazer:
-- Criar ficheiro TXT da mensagem recebida.
-- Guardar em inbox.
-
-Critério de aceitação:
-- Mensagens válidas ficam guardadas localmente.
 
 ==================================================
-K16 — Implementar deteção de adulteração
+K16 — Implementar deteção de adulteração             ✅ Feito  
 ==================================================
 
 Objetivo:

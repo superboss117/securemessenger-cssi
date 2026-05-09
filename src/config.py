@@ -1,61 +1,40 @@
 from pathlib import Path
 
 
-# =========================================
-# CAMINHOS DO SISTEMA
-# =========================================
+# =========================================================
+# CONFIGURAÇÃO GERAL DO SISTEMA
+# =========================================================
+
+NOME_DO_SISTEMA = "Sistema Seguro de Mensagens Hospitalares"
+
+VERSAO_DO_SISTEMA = "1.0"
+
+
+# =========================================================
+# CAMINHOS DAS PASTAS
+# =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DATA_DIR = BASE_DIR / "data"
+PASTA_DADOS = BASE_DIR / "data"
 
-KEYS_DIR = DATA_DIR / "keys"
+PASTA_CHAVES = PASTA_DADOS / "keys"
 
-MESSAGES_DIR = DATA_DIR / "messages"
+PASTA_MENSAGENS = PASTA_DADOS / "messages"
 
 
-# =========================================
-# USERS DO SISTEMA
-# =========================================
+# =========================================================
+# ATORES DO SISTEMA
+# =========================================================
 
 DRA_CARLA = "carla"
 
 ENF_RUI = "rui"
 
 
-# =========================================
-# CONFIGURAÇÃO CRIPTOGRÁFICA
-# =========================================
-
-ALGORITMO_HASH = "BLAKE2b"
-
-ALGORITMO_ASSINATURA = "Ed25519"
-
-ALGORITMO_TROCA_CHAVES = "X25519"
-
-ALGORITMO_KDF = "HKDF-SHA256"
-
-ALGORITMO_CIFRA = "ChaCha20-Poly1305"
-
-
-# =========================================
-# PARÂMETROS CRIPTOGRÁFICOS
-# =========================================
-
-TAMANHO_CHAVE_CHACHA20 = 32
-
-TAMANHO_NONCE_CHACHA20 = 12
-
-TAMANHO_DERIVACAO_HKDF = 32
-
-INFO_HKDF = b"securemessenger-hospital"
-
-SALT_HKDF = None
-
-
-# =========================================
+# =========================================================
 # TIPOS DE MENSAGEM
-# =========================================
+# =========================================================
 
 TIPOS_MENSAGEM = {
     "1": "transferencia_doente",
@@ -64,23 +43,31 @@ TIPOS_MENSAGEM = {
 }
 
 
-# =========================================
-# DEFINIÇÕES DE SEGURANÇA
-# =========================================
+# =========================================================
+# ALGORITMOS UTILIZADOS
+# =========================================================
 
-PERMITIR_REMETENTES_DESCONHECIDOS = False
+ALGORITMO_HASH = "BLAKE2b"
 
-VALIDAR_ASSINATURAS = True
+ALGORITMO_ASSINATURA_DIGITAL = "Ed25519"
 
-VALIDAR_HASHES = True
+ALGORITMO_TROCA_DE_CHAVES = "X25519"
 
-REJEITAR_MENSAGENS_INVALIDAS = True
+ALGORITMO_DERIVACAO_DE_CHAVES = "HKDF-SHA256"
 
+ALGORITMO_CIFRAGEM = "ChaCha20-Poly1305"
 
-# =========================================
-# DEFINIÇÕES GERAIS DO SISTEMA
-# =========================================
+# =========================================================
+# ESTRUTURA DO JSON
+# =========================================================
 
-NOME_SISTEMA = "Sistema Seguro de Mensagens Hospitalares"
-
-VERSAO_SISTEMA = "1.0"
+CAMPO_REMETENTE = "sender"
+CAMPO_DESTINATARIO = "receiver"
+CAMPO_TIMESTAMP = "timestamp"
+CAMPO_ALGORITMOS = "algorithm"
+CAMPO_NONCE = "nonce"
+CAMPO_CIPHERTEXT = "ciphertext"
+CAMPO_ASSINATURA = "signature"
+CAMPO_HASH = "hash"
+CAMPO_TIPO_MENSAGEM = "message_type"
+CAMPO_ID_DOENTE = "patient_id"

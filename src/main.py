@@ -32,16 +32,6 @@ from config import (
 )
 
 
-def mostrar_menu():
-    print("\n====================================")
-    print(f" {NOME_DO_SISTEMA} ")
-    print("====================================")
-    print("1. Gerir/Gerar chaves")
-    print("2. Dra. Carla - Preparar mensagem segura")
-    print("3. Enf. Rui - Receber, decifrar e verificar mensagem")
-    print("4. Sair")
-    print("====================================")
-
 
 def gerar_chaves_atores():
     print("\n--- GESTÃO DE CHAVES ---")
@@ -54,20 +44,6 @@ def gerar_chaves_atores():
 
     print("\n[OK] Chaves geridas com sucesso.")
 
-
-def escolher_tipo_mensagem():
-    while True:
-        print("\nTipo de mensagem:")
-        print("1. Ordem de transferência de doente")
-        print("2. Alteração de medicação")
-        print("3. Resultado urgente")
-
-        opcao = input("Escolha o tipo: ").strip()
-
-        if opcao in TIPOS_MENSAGEM:
-            return TIPOS_MENSAGEM[opcao]
-
-        print("[ERRO] Opção inválida. Escolha 1, 2 ou 3.")
 
 def carla_preparar_mensagem():
     print("\n--- DRA. CARLA: PREPARAR MENSAGEM SEGURA ---")
@@ -287,7 +263,30 @@ def extrair_conteudo_clinico(plaintext: str) -> str:
 
     return ""
 
+def escolher_tipo_mensagem():
+    while True:
+        print("\nTipo de mensagem:")
+        print("1. Ordem de transferência de doente")
+        print("2. Alteração de medicação")
+        print("3. Resultado urgente")
 
+        opcao = input("Escolha o tipo: ").strip()
+
+        if opcao in TIPOS_MENSAGEM:
+            return TIPOS_MENSAGEM[opcao]
+
+        print("[ERRO] Opção inválida. Escolha 1, 2 ou 3.")
+
+
+def mostrar_menu():
+    print("\n====================================")
+    print(f" {NOME_DO_SISTEMA} ")
+    print("====================================")
+    print("1. Gerir/Gerar chaves")
+    print("2. Dra. Carla - Preparar mensagem segura")
+    print("3. Enf. Rui - Receber, decifrar e verificar mensagem")
+    print("4. Sair")
+    print("====================================")
 
 
 def main():
