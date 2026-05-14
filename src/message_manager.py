@@ -184,6 +184,8 @@ def obter_metadados_aad_de_json(message_json: dict) -> dict:
 
 def listar_mensagens(receiver: str | None = None) -> list[Path]:
 
+    
+
     MESSAGES_DIR.mkdir(parents=True, exist_ok=True)
 
     mensagens = sorted(
@@ -210,4 +212,88 @@ def listar_mensagens(receiver: str | None = None) -> list[Path]:
 
     return mensagens_filtradas
 
-    
+    def criar_envelope_assinavel(message_json: dict) -> dict:
+        """
+        Cria o envelope canónico que será assinado com Ed25519.
+
+        Importante:
+        - A assinatura NÃO entra no envelope, para evitar circularidade.
+        - O envelope inclui metadados e dados criptográficos relevantes.
+        - O salt só é incluído se já existir no JSON.
+        """
+
+    envelope = {
+        "schema": "securemessenger.signed_envelope.v1",
+        "metadata": {
+            CAMPO_REMETENTE: message_json.get(CAMPO_REMETENTE),
+            CAMPO_DESTINATARIO: message_json.get(CAMPO_DESTINATARIO),
+            CAMPO_TIMESTAMP: message_json.get(CAMPO_TIMESTAMP),
+            CAMPO_TIPO_MENSAGEM: message_json.get(CAMPO_TIPO_MENSAGEM),
+            CAMPO_ID_DOENTE: message_json.get(CAMPO_ID_DOENTE),
+            CAMPO_ALGORITMOS: message_json.get(CAMPO_ALGORITMOS),
+        },
+        "crypto": {
+            CAMPO_NONCE: message_json.get(CAMPO_NONCE),
+            CAMPO_CIPHERTEXT: message_json.get(CAMPO_CIPHERTEXT),
+            CAMPO_HASH: message_json.get(CAMPO_HASH),
+        },
+    }
+
+    # Não introduzimos salt nesta etapa.
+    # Apenas o incluímos se já existir no JSON.
+    if "salt" in message_json and message_json.get("salt") is not None:
+        envelope["crypto"]["salt"] = message_json.get("salt")
+
+    return envelope
+
+
+
+def criar_envelope_assinavel(message_json: dict) -> dict:
+    """
+    Cria o envelope canónico que será assinado com Ed25519.
+
+    Importante:
+    - A assinatura NÃO entra no envelope, para evitar circularidade.
+    - O envelope inclui metadados e dados criptográficos relevantes.
+    - O salt só é incluído se já existir no JSON.
+    """
+
+    envelope = {
+        "schema": "securemessenger.signed_envelope.v1",
+        "metadata": {
+            CAMPO_REMETENTE: message_json.get(CAMPO_REMETENTE),
+            CAMPO_DESTINATARIO: message_json.get(CAMPO_DESTINATARIO),
+            CAMPO_TIMESTAMP: message_json.get(CAMPO_TIMESTAMP),
+            CAMPO_TIPO_MENSAGEM: message_json.get(CAMPO_TIPO_MENSAGEM),
+            CAMPO_ID_DOENTE: message_json.get(CAMPO_ID_DOENTE),
+            CAMPO_ALGORITMOS: message_json.get(CAMPO_ALGORITMOS),
+        },
+        "crypto": {
+            CAMPO_NONCE: message_json.get(CAMPO_NONCE),
+            CAMPO_CIPHERTEXT: message_json.get(CAMPO_CIPHERTEXT),
+            CAMPO_HASH: message_json.get(CAMPO_HASH),
+        },
+    }
+
+    # Não introduzimos salt nesta etapa.
+    # Apenas o incluímos se já existir no JSON.
+    if "salt" in message_json and message_json.get("salt") is not None:
+        envelope["crypto"]["salt"] = message_json.get("salt")
+
+    return envelope
+
+def serializar_envelope_assinavel_canonico(message_json: dict) -> str:
+    """
+    Serializa o envelope assinável de forma canónica.
+
+    Esta string é exatamente o que será assinado e verificado.
+    """
+
+    envelope = criar_envelope_assinavel(message_json)
+
+    return json.dumps(
+        envelope,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )

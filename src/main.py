@@ -23,6 +23,7 @@ from message_manager import (
     criar_metadados_aad,
     serializar_aad_canonico,
     obter_metadados_aad_de_json,
+    serializar_envelope_assinavel_canonico,
 )
 
 from cryptography.exceptions import InvalidTag
@@ -89,6 +90,7 @@ def carla_preparar_mensagem():
         f"Mensagem: {conteudo}\n"
     )
 
+    # 1. Criar metadados AAD uma única vez
     aad_metadata = criar_metadados_aad(
     sender=sender,
     receiver=receiver,
@@ -98,6 +100,7 @@ def carla_preparar_mensagem():
 
     associated_data = serializar_aad_canonico(aad_metadata)
 
+    # 2. Derivar segredo partilhado e chave simétrica
     shared_secret = derive_shared_secret(
     carregar_chave_privada(DRA_CARLA, "x25519"),
     carregar_chave_publica(ENF_RUI, "x25519")
@@ -105,17 +108,20 @@ def carla_preparar_mensagem():
 
     chacha_key = derive_chacha20_key(shared_secret)
 
+    # 3. Cifrar com ChaCha20-Poly1305 usando AAD
     nonce, ciphertext = encrypt_message_ChaCha20Poly1305(
     plaintext,
     chacha_key,
-    associated_data=associated_data)
+    associated_data=associated_data
+    )
 
+    # 4. Criar JSON ainda sem assinatura
     message_json = criar_json_mensagem(
     sender=sender,
     receiver=receiver,
     nonce=nonce,
     ciphertext=ciphertext,
-    signature=assinatura,
+    signature=None,
     hash_value=hash_mensagem,
     timestamp=aad_metadata["timestamp"],
     message_type=aad_metadata["message_type"],
@@ -123,6 +129,21 @@ def carla_preparar_mensagem():
     algorithm=aad_metadata["algorithm"],
     )
 
+    # 5. Serializar envelope completo de forma canónica
+    envelope_canonico = serializar_envelope_assinavel_canonico(message_json)
+
+    # 6. Assinar envelope completo com Ed25519
+    private_key_sender = carregar_chave_privada(DRA_CARLA, "ed25519")
+
+    assinatura = sign_message(
+    private_key_sender,
+    envelope_canonico
+    )
+
+    # 7. Inserir assinatura no JSON final
+    message_json["signature"] = assinatura.hex()
+
+    # 8. Guardar mensagem
     path = guardar_mensagem_cifrada(message_json)
 
     print("\n[OK] Mensagem cifrada criada pela Dra. Carla.")
@@ -179,6 +200,31 @@ def rui_receber_mensagem():
             print("O sistema só aceita mensagens da Dra. Carla.")
             return
 
+        if campos["signature"] is None:
+            print("\n[ERRO DE AUTENTICIDADE]")
+            print("A mensagem não contém assinatura digital.")
+            print("Mensagem rejeitada.")
+            return
+
+        # 1. Reconstruir o envelope canónico recebido
+        envelope_canonico = serializar_envelope_assinavel_canonico(message_json)
+
+        # 2. Verificar assinatura Ed25519 sobre o envelope completo
+        public_key_sender = carregar_chave_publica(DRA_CARLA, "ed25519")
+
+        assinatura_valida = verify_signature(
+        public_key_sender,
+        envelope_canonico,
+        campos["signature"]
+        )
+
+        if not assinatura_valida:
+            print("\n[ERRO DE AUTENTICIDADE]")
+            print("A assinatura digital do envelope é inválida.")
+            print("A mensagem pode ter sido alterada.")
+            print("Mensagem rejeitada.")
+            return
+
         shared_secret = derive_shared_secret(
             carregar_chave_privada(ENF_RUI, "x25519"),
             carregar_chave_publica(DRA_CARLA, "x25519")
@@ -217,22 +263,7 @@ def rui_receber_mensagem():
             print("Mensagem rejeitada.")
             return
 
-        public_key_sender = carregar_chave_publica(
-            campos["sender"],
-            "ed25519"
-        )
-
-        assinatura_valida = verify_signature(
-            public_key_sender,
-            hash_recalculada,
-            campos["signature"]
-        )
-
-        if not assinatura_valida:
-            print("\n[ERRO DE AUTENTICIDADE]")
-            print("A assinatura digital é inválida.")
-            print("Mensagem rejeitada.")
-            return
+   
 
         print("\n--- RESULTADO DA VERIFICAÇÃO ---")
         print("Remetente:", campos["sender"])
