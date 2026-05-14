@@ -10,6 +10,7 @@ def derive_shared_secret(
     my_private_key: X25519PrivateKey,
     peer_public_key: X25519PublicKey
 ) -> bytes:
+
     """
     Gera o segredo partilhado X25519 entre a minha chave privada
     e a chave pública do outro utilizador.
@@ -18,6 +19,7 @@ def derive_shared_secret(
 
 
 def derive_chacha20_key(shared_secret: bytes, salt: bytes | None = None) -> bytes:
+    
     """
     Deriva uma chave simétrica de 32 bytes para ChaCha20-Poly1305.
     """
