@@ -20,6 +20,9 @@ from message_manager import (
     ler_mensagem_recebida,
     extrair_campos_mensagem,
     listar_mensagens,
+    criar_metadados_aad,
+    serializar_aad_canonico,
+    obter_metadados_aad_de_json,
 )
 
 from cryptography.exceptions import InvalidTag
@@ -86,29 +89,39 @@ def carla_preparar_mensagem():
         f"Mensagem: {conteudo}\n"
     )
 
+    aad_metadata = criar_metadados_aad(
+    sender=sender,
+    receiver=receiver,
+    message_type=tipo,
+    patient_id=paciente_id,
+    )
+
+    associated_data = serializar_aad_canonico(aad_metadata)
+
     shared_secret = derive_shared_secret(
-        carregar_chave_privada(DRA_CARLA, "x25519"),
-        carregar_chave_publica(ENF_RUI, "x25519")
+    carregar_chave_privada(DRA_CARLA, "x25519"),
+    carregar_chave_publica(ENF_RUI, "x25519")
     )
 
     chacha_key = derive_chacha20_key(shared_secret)
 
     nonce, ciphertext = encrypt_message_ChaCha20Poly1305(
-        plaintext,
-        chacha_key
-    )
+    plaintext,
+    chacha_key,
+    associated_data=associated_data)
 
     message_json = criar_json_mensagem(
-        sender=sender,
-        receiver=receiver,
-        nonce=nonce,
-        ciphertext=ciphertext,
-        signature=assinatura,
-        hash_value=hash_mensagem,
+    sender=sender,
+    receiver=receiver,
+    nonce=nonce,
+    ciphertext=ciphertext,
+    signature=assinatura,
+    hash_value=hash_mensagem,
+    timestamp=aad_metadata["timestamp"],
+    message_type=aad_metadata["message_type"],
+    patient_id=aad_metadata["patient_id"],
+    algorithm=aad_metadata["algorithm"],
     )
-
-    message_json["message_type"] = tipo
-    message_json["patient_id"] = paciente_id
 
     path = guardar_mensagem_cifrada(message_json)
 
@@ -173,10 +186,14 @@ def rui_receber_mensagem():
 
         chacha_key = derive_chacha20_key(shared_secret)
 
+        aad_metadata = obter_metadados_aad_de_json(message_json)
+        associated_data = serializar_aad_canonico(aad_metadata)
+
         plaintext = decrypt_message_ChaCha20Poly1305(
-            campos["nonce"],
-            campos["ciphertext"],
-            chacha_key
+        campos["nonce"],
+        campos["ciphertext"],
+        chacha_key,
+        associated_data=associated_data
         )
 
         tipo = message_json.get("message_type")
