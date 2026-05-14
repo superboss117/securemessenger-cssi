@@ -19,6 +19,7 @@ from config import (
     CAMPO_HASH,
     CAMPO_TIPO_MENSAGEM,
     CAMPO_ID_DOENTE,
+    CAMPO_SALT,
 )
 
 
@@ -36,6 +37,7 @@ def criar_json_mensagem(
     message_type: str | None = None,
     patient_id: str | None = None,
     algorithm: dict | None = None,
+    salt: bytes | None = None,
 ) -> dict:
     if timestamp is None:
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -52,6 +54,7 @@ def criar_json_mensagem(
         CAMPO_ID_DOENTE: patient_id,
         CAMPO_NONCE: nonce.hex(),
         CAMPO_CIPHERTEXT: ciphertext.hex(),
+        CAMPO_SALT: salt.hex() if salt is not None else None,
         CAMPO_ASSINATURA: signature.hex() if signature else None,
         CAMPO_HASH: hash_value,
     }
@@ -87,9 +90,12 @@ def extrair_campos_mensagem(message_json: dict):
     ciphertext = bytes.fromhex(message_json[CAMPO_CIPHERTEXT])
 
     signature = None
-
     if message_json.get(CAMPO_ASSINATURA):
         signature = bytes.fromhex(message_json[CAMPO_ASSINATURA])
+    
+    salt = None
+    if message_json.get(CAMPO_SALT):
+        salt = bytes.fromhex(message_json[CAMPO_SALT])
 
     return {
         CAMPO_REMETENTE: message_json[CAMPO_REMETENTE],
@@ -97,6 +103,7 @@ def extrair_campos_mensagem(message_json: dict):
         CAMPO_TIMESTAMP: message_json[CAMPO_TIMESTAMP],
         CAMPO_NONCE: nonce,
         CAMPO_CIPHERTEXT: ciphertext,
+        CAMPO_SALT: salt,
         CAMPO_ASSINATURA: signature,
         CAMPO_HASH: message_json.get(CAMPO_HASH),
         CAMPO_ALGORITMOS: message_json.get(CAMPO_ALGORITMOS),
@@ -275,10 +282,10 @@ def criar_envelope_assinavel(message_json: dict) -> dict:
         },
     }
 
-    # Não introduzimos salt nesta etapa.
+    
     # Apenas o incluímos se já existir no JSON.
-    if "salt" in message_json and message_json.get("salt") is not None:
-        envelope["crypto"]["salt"] = message_json.get("salt")
+    if message_json.get(CAMPO_SALT) is not None:
+        envelope["crypto"][CAMPO_SALT] = message_json.get(CAMPO_SALT)
 
     return envelope
 

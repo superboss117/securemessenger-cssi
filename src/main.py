@@ -1,3 +1,4 @@
+import os
 from key_manager import (
     gerar_par_ed25519,
     gerar_par_x25519,
@@ -106,7 +107,16 @@ def carla_preparar_mensagem():
     carregar_chave_publica(ENF_RUI, "x25519")
     )
 
-    chacha_key = derive_chacha20_key(shared_secret)
+    # 3. Gerar salt aleatório por mensagem
+    salt = os.urandom(16)
+
+
+    # 4. Derivar chave ChaCha20-Poly1305 com HKDF + salt
+    chacha_key = derive_chacha20_key(
+    shared_secret,
+    salt=salt
+    )
+
 
     # 3. Cifrar com ChaCha20-Poly1305 usando AAD
     nonce, ciphertext = encrypt_message_ChaCha20Poly1305(
@@ -127,6 +137,7 @@ def carla_preparar_mensagem():
     message_type=aad_metadata["message_type"],
     patient_id=aad_metadata["patient_id"],
     algorithm=aad_metadata["algorithm"],
+    salt=salt,
     )
 
     # 5. Serializar envelope completo de forma canónica
@@ -200,11 +211,18 @@ def rui_receber_mensagem():
             print("O sistema só aceita mensagens da Dra. Carla.")
             return
 
+        if campos["salt"] is None:
+            print("\n[ERRO CRIPTOGRÁFICO]")
+            print("A mensagem não contém salt para o HKDF.")
+            print("Mensagem rejeitada.")
+            return
+
         if campos["signature"] is None:
             print("\n[ERRO DE AUTENTICIDADE]")
             print("A mensagem não contém assinatura digital.")
             print("Mensagem rejeitada.")
             return
+
 
         # 1. Reconstruir o envelope canónico recebido
         envelope_canonico = serializar_envelope_assinavel_canonico(message_json)
@@ -213,9 +231,9 @@ def rui_receber_mensagem():
         public_key_sender = carregar_chave_publica(DRA_CARLA, "ed25519")
 
         assinatura_valida = verify_signature(
-        public_key_sender,
-        envelope_canonico,
-        campos["signature"]
+            public_key_sender,
+            envelope_canonico,
+            campos["signature"]
         )
 
         if not assinatura_valida:
@@ -230,7 +248,7 @@ def rui_receber_mensagem():
             carregar_chave_publica(DRA_CARLA, "x25519")
         )
 
-        chacha_key = derive_chacha20_key(shared_secret)
+        chacha_key = derive_chacha20_key(shared_secret, salt=campos["salt"])
 
         aad_metadata = obter_metadados_aad_de_json(message_json)
         associated_data = serializar_aad_canonico(aad_metadata)
