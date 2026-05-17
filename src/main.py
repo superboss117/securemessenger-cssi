@@ -123,7 +123,6 @@ def gerar_chaves_rui():
     try:
         password = pedir_password_chaves(ENF_RUI, confirmar=True)
 
-        gerar_par_ed25519(ENF_RUI, password=password)
         gerar_par_x25519(ENF_RUI, password=password)
 
         print("\n[OK] Chaves do Enf. Rui geridas com sucesso.")

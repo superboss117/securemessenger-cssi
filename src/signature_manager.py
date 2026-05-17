@@ -27,23 +27,8 @@ def verify_signature(
     message: str,
     signature: bytes
 ) -> bool:
-    """
-    Verifica uma assinatura digital Ed25519.
-
-    Args:
-        public_key:
-            Chave pública Ed25519.
-
-        message:
-            Mensagem original.
-
-        signature:
-            Assinatura digital.
-
-    Returns:
-        True se a assinatura for válida.
-        False se a assinatura for inválida.
-    """
+   
+   #passa para bytes e verfica assinatura
 
     message_bytes = message.encode("utf-8")
 
